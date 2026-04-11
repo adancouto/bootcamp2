@@ -1,0 +1,239 @@
+{% extends "tarefas/base.html" %}
+
+{% block title %}TaskFlow - Gerenciador de Tarefas{% endblock %}
+
+{% block content %}
+<!-- Estatísticas Principais -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-tasks fa-2x text-primary mb-2"></i>
+                <h3 class="fw-bold text-primary">{{ total_tarefas }}</h3>
+                <p class="text-muted mb-0">Total de Tarefas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                <h3 class="fw-bold text-success">{{ tarefas_concluidas }}</h3>
+                <p class="text-muted mb-0">Concluídas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card stats-card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                <h3 class="fw-bold text-warning">{{ tarefas_pendentes }}</h3>
+                <p class="text-muted mb-0">Pendentes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card progress-card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-chart-line fa-2x mb-2"></i>
+                <h3 class="fw-bold">{{ progresso|floatformat:1 }}%</h3>
+                <p class="mb-2">Progresso Geral</p>
+                <div class="progress" style="height: 8px;">
+                    <div class="progress-bar bg-white" role="progressbar" style="width: {{ progresso }}%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros Avançados -->
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filtros</h5>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Prioridade</label>
+                <select name="prioridade" class="form-select">
+                    <option value="">Todas</option>
+                    {% for cod, nome in prioridades %}
+                        <option value="{{ cod }}" {% if prioridade_filtro == cod %}selected{% endif %}>{{ nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Categoria</label>
+                <select name="categoria" class="form-select">
+                    <option value="">Todas</option>
+                    {% for cod, nome in categorias %}
+                        <option value="{{ cod }}" {% if categoria_filtro == cod %}selected{% endif %}>{{ nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="pendentes" {% if status_filtro == "pendentes" %}selected{% endif %}>Pendentes</option>
+                    <option value="concluidas" {% if status_filtro == "concluidas" %}selected{% endif %}>Concluídas</option>
+                    <option value="atrasadas" {% if status_filtro == "atrasadas" %}selected{% endif %}>Atrasadas</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary me-2 btn-custom">
+                    <i class="fas fa-search me-1"></i>Filtrar
+                </button>
+                {% if prioridade_filtro or categoria_filtro or status_filtro %}
+                    <a href="{% url 'tarefas:index' %}" class="btn btn-outline-secondary btn-custom">
+                        <i class="fas fa-times me-1"></i>Limpar
+                    </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Resumos por Prioridade e Categoria -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Por Prioridade</h6>
+            </div>
+            <div class="card-body">
+                {% if resumo_prioridade %}
+                    <div class="row g-2">
+                    {% for item in resumo_prioridade %}
+                        <div class="col-6">
+                            <div class="p-2 border rounded text-center">
+                                <small class="text-muted d-block">{{ item.nome }}</small>
+                                <strong class="text-primary">{{ item.total }}</strong>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center mb-0">Nenhuma tarefa encontrada</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="fas fa-tags me-2"></i>Por Categoria</h6>
+            </div>
+            <div class="card-body">
+                {% if resumo_categoria %}
+                    <div class="row g-2">
+                    {% for item in resumo_categoria %}
+                        <div class="col-6">
+                            <div class="p-2 border rounded text-center">
+                                <small class="text-muted d-block">{{ item.nome }}</small>
+                                <strong class="text-info">{{ item.total }}</strong>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted text-center mb-0">Nenhuma tarefa encontrada</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de Tarefas em Cards -->
+<div class="row">
+    {% for tarefa in tarefas %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 {% if tarefa.esta_atrasada %}border-danger{% endif %}">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 text-truncate" title="{{ tarefa.titulo }}">{{ tarefa.titulo }}</h6>
+                {% if tarefa.concluida %}
+                    <i class="fas fa-check-circle text-success"></i>
+                {% else %}
+                    <i class="fas fa-circle text-muted"></i>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if tarefa.descricao %}
+                    <p class="card-text small text-muted mb-2">{{ tarefa.descricao|truncatechars:100 }}</p>
+                {% endif %}
+
+                <div class="mb-2">
+                    <span class="badge badge-custom
+                        {% if tarefa.prioridade == 'urgent' %}bg-danger
+                        {% elif tarefa.prioridade == 'high' %}bg-warning text-dark
+                        {% elif tarefa.prioridade == 'medium' %}bg-info
+                        {% else %}bg-secondary{% endif %}">
+                        <i class="fas fa-flag me-1"></i>{{ tarefa.get_prioridade_display }}
+                    </span>
+                    <span class="badge badge-custom bg-light text-dark ms-1">
+                        <i class="fas fa-tag me-1"></i>{{ tarefa.get_categoria_display }}
+                    </span>
+                </div>
+
+                {% if tarefa.data_vencimento %}
+                    <div class="mb-2">
+                        <small class="text-muted">
+                            <i class="fas fa-calendar me-1"></i>
+                            {% if tarefa.esta_atrasada %}
+                                <span class="text-danger fw-bold">Atrasada: {{ tarefa.data_vencimento|date:"d/m/Y" }}</span>
+                            {% elif tarefa.dias_para_vencer == 0 %}
+                                <span class="text-warning fw-bold">Vence hoje</span>
+                            {% elif tarefa.dias_para_vencer|default:999 < 3 %}
+                                <span class="text-warning">Vence em {{ tarefa.dias_para_vencer }} dia{{ tarefa.dias_para_vencer|pluralize }}</span>
+                            {% else %}
+                                Vence em {{ tarefa.data_vencimento|date:"d/m/Y" }}
+                            {% endif %}
+                        </small>
+                    </div>
+                {% endif %}
+
+                <small class="text-muted">
+                    <i class="fas fa-clock me-1"></i>Criado em {{ tarefa.criado_em|date:"d/m/Y H:i" }}
+                </small>
+            </div>
+            <div class="card-footer bg-transparent">
+                <div class="btn-group w-100" role="group">
+                    {% if not tarefa.concluida %}
+                        <a href="{% url 'tarefas:concluir' tarefa.pk %}" class="btn btn-success btn-sm btn-custom">
+                            <i class="fas fa-check me-1"></i>Concluir
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'tarefas:editar' tarefa.pk %}" class="btn btn-primary btn-sm btn-custom">
+                        <i class="fas fa-edit me-1"></i>Editar
+                    </a>
+                    <a href="{% url 'tarefas:excluir' tarefa.pk %}" class="btn btn-danger btn-sm btn-custom">
+                        <i class="fas fa-trash me-1"></i>Excluir
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Nenhuma tarefa encontrada</h5>
+                <p class="text-muted">Que tal criar sua primeira tarefa?</p>
+                <a href="{% url 'tarefas:adicionar' %}" class="btn btn-primary btn-custom">
+                    <i class="fas fa-plus me-1"></i>Criar Tarefa
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if tarefas_atrasadas > 0 %}
+<div class="alert alert-danger mt-4" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    <strong>Atenção!</strong> Você tem {{ tarefas_atrasadas }} tarefa{{ tarefas_atrasadas|pluralize }} atrasada{{ tarefas_atrasadas|pluralize }}.
+</div>
+{% endif %}
+
+{% endblock %}

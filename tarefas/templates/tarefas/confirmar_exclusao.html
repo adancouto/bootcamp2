@@ -1,0 +1,58 @@
+{% extends "tarefas/base.html" %}
+
+{% block title %}Confirmar Exclusão — TaskFlow{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger shadow-lg">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Confirmar Exclusão</h4>
+            </div>
+            <div class="card-body text-center p-4">
+                <div class="mb-4">
+                    <i class="fas fa-trash-alt fa-4x text-danger mb-3"></i>
+                    <h5 class="fw-bold">Tem certeza que deseja excluir?</h5>
+                </div>
+
+                <div class="card bg-light mb-4">
+                    <div class="card-body">
+                        <h6 class="card-title text-primary">{{ tarefa.titulo }}</h6>
+                        {% if tarefa.descricao %}
+                            <p class="card-text small text-muted">{{ tarefa.descricao }}</p>
+                        {% endif %}
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <small class="text-muted d-block">Prioridade</small>
+                                <span class="badge bg-secondary">{{ tarefa.get_prioridade_display }}</span>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted d-block">Categoria</small>
+                                <span class="badge bg-info">{{ tarefa.get_categoria_display }}</span>
+                            </div>
+                        </div>
+                        {% if tarefa.data_vencimento %}
+                            <div class="mt-2">
+                                <small class="text-muted d-block">Data de Vencimento</small>
+                                <span class="fw-semibold">{{ tarefa.data_vencimento|date:"d/m/Y" }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <p class="text-muted mb-4">Esta ação não pode ser desfeita.</p>
+
+                <form method="post" class="d-flex justify-content-center gap-3">
+                    {% csrf_token %}
+                    <a href="{% url 'tarefas:index' %}" class="btn btn-outline-secondary btn-custom">
+                        <i class="fas fa-arrow-left me-1"></i>Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-danger btn-custom">
+                        <i class="fas fa-trash me-1"></i>Sim, excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
