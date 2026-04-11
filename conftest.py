@@ -1,19 +1,9 @@
+import os
 import django
 from django.conf import settings
 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+
 def pytest_configure(config):
-    settings.configure(
-        DATABASES={
-            "default": {
-                "ENGINE": "django.db.backends.sqlite3",
-                "NAME": ":memory:",
-            }
-        },
-        INSTALLED_APPS=[
-            "django.contrib.contenttypes",
-            "django.contrib.auth",
-            "tarefas",
-        ],
-        DEFAULT_AUTO_FIELD="django.db.models.AutoField",
-    )
-    django.setup()
+    if not settings.configured:
+        django.setup()
