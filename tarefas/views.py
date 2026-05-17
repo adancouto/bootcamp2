@@ -6,6 +6,7 @@ from django.utils import timezone
 
 from .forms import TarefaForm
 from .models import CATEGORIAS, PRIORIDADES, Tarefa
+from .services import obter_citacao_motivacional
 
 
 def index(request):
@@ -50,6 +51,8 @@ def index(request):
         if subtotal > 0:
             resumo_categoria.append({"nome": nome, "total": subtotal, "codigo": cod})
 
+    citacao = obter_citacao_motivacional()
+
     context = {
         "tarefas": tarefas,
         "total_tarefas": total_tarefas,
@@ -64,6 +67,7 @@ def index(request):
         "prioridade_filtro": prioridade_filtro,
         "categoria_filtro": categoria_filtro,
         "status_filtro": status_filtro,
+        "citacao": citacao,
     }
     return render(request, "tarefas/index.html", context)
 

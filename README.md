@@ -66,6 +66,9 @@ ruff check .
 # Versão
 1.0.0
 
+# Deploy
+Link público: https://<seu-deploy-aqui>
+
 # Autor
 Adan Couto — github.com/adancouto
 
