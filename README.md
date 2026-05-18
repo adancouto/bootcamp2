@@ -83,6 +83,12 @@ gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
 - `DJANGO_ALLOWED_HOSTS=<seu-app>.onrender.com`
 - `DJANGO_SECRET_KEY=<uma-chave-secreta>`
 
+## Deploy no Render
+Se estiver usando Render, o arquivo `render.yaml` já está configurado para:
+- instalar dependências
+- executar as migrações com `python manage.py migrate`
+- iniciar o app com `gunicorn config.wsgi:application --bind 0.0.0.0:$PORT`
+
 # Autor
 Adan Couto — github.com/adancouto
 
