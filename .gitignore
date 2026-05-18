@@ -13,6 +13,9 @@ db.sqlite3
 .venv/
 .env
 
+# Nested repository artifact
+bootcamp2/
+
 # Editor files
 .DS_Store
 .idea/

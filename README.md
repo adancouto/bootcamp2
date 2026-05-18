@@ -66,6 +66,33 @@ ruff check .
 # Versão
 1.0.0
 
+# Deploy
+Link público: https://<seu-deploy-aqui>
+
+## Como publicar
+- Instale as dependências: `pip install -r requirements.txt`
+- Use `gunicorn` como servidor de aplicação
+- Se estiver usando Render, o comando de start pode ser:
+
+```bash
+gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+```
+
+## Variáveis de ambiente recomendadas
+- `DJANGO_DEBUG=false`
+- `DJANGO_ALLOWED_HOSTS=<seu-app>.onrender.com`
+- `DJANGO_SECRET_KEY=<uma-chave-secreta>`
+
+## Deploy no Render
+Se estiver usando Render, o arquivo `render.yaml` já está configurado para:
+- instalar dependências
+- executar as migrações com `python manage.py migrate`
+- iniciar o app com `gunicorn config.wsgi:application --bind 0.0.0.0:$PORT`
+Se o serviço não estiver usando `render.yaml`, o `Procfile` também garante que as migrações sejam executadas antes do servidor:
+
+```bash
+web: python manage.py migrate && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+```
 # Autor
 Adan Couto — github.com/adancouto
 
