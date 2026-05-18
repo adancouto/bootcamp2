@@ -69,6 +69,20 @@ ruff check .
 # Deploy
 Link público: https://<seu-deploy-aqui>
 
+## Como publicar
+- Instale as dependências: `pip install -r requirements.txt`
+- Use `gunicorn` como servidor de aplicação
+- Se estiver usando Render, o comando de start pode ser:
+
+```bash
+gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+```
+
+## Variáveis de ambiente recomendadas
+- `DJANGO_DEBUG=false`
+- `DJANGO_ALLOWED_HOSTS=<seu-app>.onrender.com`
+- `DJANGO_SECRET_KEY=<uma-chave-secreta>`
+
 # Autor
 Adan Couto — github.com/adancouto
 
